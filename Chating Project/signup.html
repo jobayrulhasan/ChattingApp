@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Chatting App</title>
+    <link rel="shortcut icon" href="images/image-2.png">
+    <style>
+      body{
+        background-image: url('images/image6\ \(3\).jpg');
+      }
+      #body{
+        background: rgb(94, 97, 94);
+        width: 550px;
+        height: 300px;
+        margin: 0 auto;
+        margin-top: 150px;
+        box-shadow: 0 0 5p rgb(206, 203, 199);
+        border-radius: 10px;
+        padding:20px;
+      }
+    #txtUser{
+    background: #faf5f5;
+    width: 45%;
+    height: 15px;
+    border: 2px solid #eee;
+    border-radius: 3px;
+    padding: 10px;
+    font-size: 18px;
+    color: #333;
+  }
+
+  #txtUser:focus{
+    background: rgb(143, 87, 87);
+  }
+
+#btnSignUp{
+  background-color: #4CAF50;
+  border: none;
+  color: black;
+  padding: 15px 32px;
+  text-align: center;
+  border-radius: 5px;
+  font-size: 16px;
+}
+#btnSignUp:hover{
+  background: black;
+  color: white;
+
+
+
+</style>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script>
+       var oPosition = null;
+       $(function () {
+            //getLocation();
+            $('#btnSignUp').click(function(){
+                var oUserInfo = {
+                    "userId": $('#txtUser').val()
+                };
+              sessionStorage.setItem('userInfo', JSON.stringify(oUserInfo));
+              window.location.replace("http://localhost:8000/chat");
+            });
+        });
+    </script>
+  </head>
+  <body>
+    <div id="body">
+      <div>
+        <img src="images/image-2.png" alt="" style="height: 80px; width: 80px; border-radius: 50%; padding: 0px; position: absolute;">
+        <h1 style="text-align: center;">Login interface</h1>
+      </div>
+      <div id="divSignUp">
+        <label style="font-size: 25px; margin-left: 100px;padding-right: 6px;"><strong>User name:</strong></label><input type="text" id="txtUser" /><br><br>
+        <label style="font-size: 25px;margin-left: 100px;padding-right: 15px;"><strong>Password:</strong></label><input type="password" id="txtUser" /><br><br>
+        <input type="button" id="btnSignUp" value="Login">
+      </div>
+    </div>
+   
+    </body>
+</html>

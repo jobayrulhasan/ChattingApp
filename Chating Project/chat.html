@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <link rel="shortcut icon" href="images/Graphicloads-100-Flat-2-Chat-2.ico">
+  
+    <style>
+    #dropContainer{
+     border:3px solid rgb(138, 8, 8);
+     height:80px;
+     width: 430px;
+    }
+    
+    body{
+      background-color: silver;
+    }
+    #form{
+      background-color: rgb(255, 247, 247);
+      width: 550px;
+      margin: 0 auto;
+      box-sizing: border-box;
+      box-shadow: 0 0 5px red;
+    border-radius: 10px;
+    padding:20px;
+    }
+
+    input{
+    background: #e2e2e2;
+    width: 40%;
+    height: 10px;
+    border: 1px solid rgb(192, 181, 181);
+    border-radius: 3px;
+    resize: none;
+    padding-top: 9px;
+    padding-bottom: 19px;
+    font-size: 13px;
+    color: #333;
+    }
+
+    input:focus{
+    background: #fff;
+    }
+
+    button{
+    background: #06c7e9;
+    padding: 4px 24px;
+    font-size: 20px;
+    border: none;
+    margin: 0 10px;
+    border-radius: 8px;
+    box-shadow: 0 8px 0 #60d5f8;
+    cursor:pointer;
+    margin-left: 2px;
+    margin-bottom: 40px;
+    }
+
+  button:hover{
+  background: #159b94;
+  }
+
+  #messages{
+  background-color: rgb(230, 243, 247);
+  width: 440px;
+  box-sizing: border-box;
+  box-shadow: 0 0 5px rgb(199, 206, 207);
+  border-radius: 5px;
+  padding:20px;
+  font-family: Comic Sans MS;
+  } 
+
+ </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/jquery-3.4.1.min.js"></script>
+    <script>
+      $(function () {
+          var strUserInfo = sessionStorage.getItem('userInfo');
+          var oUserInfo = JSON.parse(strUserInfo);
+           if(oUserInfo===null){
+            window.location.replace("http://localhost:8000");
+          }
+          $('#user').text(oUserInfo.userId);
+          var socket = io();
+          $('#formMessage').submit(function(e) {
+              e.preventDefault(); // prevents page reloading
+              if($('#m').val()===null || $('#m').val() === ''){
+                alert('Type a word to send message');
+              }else{
+                var currentDateTime = new Date();
+                var newDateTime = currentDateTime.toLocaleDateString() + ' ' + currentDateTime.toLocaleTimeString();
+                  var oMessage = {
+                      "userId": oUserInfo.userId,
+                      "message": $('#m').val(),
+                      "dateTime": newDateTime
+                  };
+                socket.emit('chat message', oMessage );
+                $('#m').val('');
+                return false;
+              }
+          });
+         socket.on('chat message', function(msg){
+              var htmlElements ='<strong>'+ msg.userId+'</strong>: '+msg.message+'<br/><span style="color:#7f8680">'+msg.dateTime+'</span>';
+              $('#messages').append($('<dt>').html(htmlElements));
+          });
+          //form Submit
+          $("#formFileUpload").submit(function(evt){	 
+            evt.preventDefault();
+            var formData = new FormData($(this)[0]);
+            var f =$('#fileInput').val();
+            if($('#fileInput').val()===''){
+              alert('Attach a file to upload');
+            }else{
+              $.ajax({
+                url: 'uploadfile',
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                enctype: 'multipart/form-data',
+                processData: false,
+                success: function (response) {
+                  var res = JSON.parse(response);
+                  var currentDateTime = new Date();
+                  var newDateTime = currentDateTime.toLocaleDateString() + ' ' + currentDateTime.toLocaleTimeString();
+                  var oMessage = { "userId":oUserInfo.userId, "message":'<a href="'+res.filePath+'" target="_blank">'+res.fileName+'</a>', "dateTime":newDateTime };
+                  socket.emit('chat message', oMessage );
+                  $('#fileInput').val('');
+                }
+              });
+              return false;
+            }
+          });
+      });
+ </script>
+</head>
+  
+  <body>
+  <div style="color: rgb(247, 14, 14);font-size: 18px;">Login Successfully...........</div>
+  <div id="form">
+    <div id="divUser">
+      <img src="./images/Graphicloads-100-Flat-2-Chat-2.ico/emotion.jpg" width="50px" height="50px" alt="">
+      <div>
+        <h1 style="text-align: center;font-family: 'Metal Mania', cursive;color: darkblue;font-size: 40px;">Virtual Chat</h1>
+      </div>
+      <strong>Welcome, </strong><span id="user"></span> 
+      </div>
+     <ul id="messages" >
+       <!-- <h3>Thanks for your starting conversion</h3> -->
+     </ul>
+     <div id="dropContainer" style="color: rgb(212, 78, 78);text-align: center;">
+         Drop your file here
+     </div><br>
+     <form id="formFileUpload">
+       <input type="file" name="fileInput" id="fileInput" multiple>
+       <input style="margin-left: 20px;" type="submit" value="Upload">
+     </form><br>
+     <form action="" id="formMessage">
+       <input id="m" autocomplete="off" placeholder="Enter your conversion here" />
+       <button style="margin-bottom: 80px;">Send</button>
+     </form>
+  </div>
+
+ <script>
+        dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
+          evt.preventDefault();
+        };
+    dropContainer.ondrop = function(evt) {
+         fileInput.files = evt.dataTransfer.files;
+         const dT = new DataTransfer();
+          dT.items.add(evt.dataTransfer.files[0]);
+          fileInput.files = dT.files;
+          evt.preventDefault();
+        };
+ </script>
+ 
+  </body>
+</html>
